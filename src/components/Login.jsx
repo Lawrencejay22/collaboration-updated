@@ -16,9 +16,7 @@ export default function Login({ onLoginSuccess, isLoggedIn, onNavigate }) {
             alert('Please enter both your GitHub username and password.');
             return;
         }
-
         setIsConnecting(true);
-
         try {
             const response = await fetch(`https://api.github.com/users/${trimmedUser}`);
             if (response.ok) {
@@ -41,48 +39,18 @@ export default function Login({ onLoginSuccess, isLoggedIn, onNavigate }) {
             setIsConnecting(false);
         }
     };
-
-    const mockGithubLogin = async (e) => {
+    const mockGithubLogin = (e) => {
         if (e && e.preventDefault) e.preventDefault();
-
-        // Automatically login as the main account without needing input
-        const mainAccount = 'Lawrencejay22';
-
-        setIsConnecting(true);
-
-        try {
-            const response = await fetch(`https://api.github.com/users/${mainAccount}`);
-
-            if (!response.ok) {
-                alert('GitHub account not found. Please check the username.');
-                return;
-            }
-
-            const data = await response.json();
-
-            onLoginSuccess({
-                username: data.login,
-                name: data.name || data.login,
-                avatar: data.avatar_url,
-                bio: data.bio || 'GitHub Developer',
-                repos: data.public_repos,
-                followers: data.followers,
-                following: data.following
-            });
-
-        } catch (error) {
-            console.error("GitHub Connection Error:", error);
-            alert('Error connecting to GitHub. Please try again.');
-        } finally {
-            setIsConnecting(false);
-        }
+        // Redirect to the backend which handles the real GitHub automatic OAuth login
+        window.location.href = '/api/auth/github';
     };
 
     return (
         <section className="login-container" id="loginForm">
             <div className="login-card">
-                <h1>Login to GitHub Account</h1>
-                <p>Enter your details to access the application</p>
+                <img src="/logo.png" alt="GitHub-User-Finder-Logo" style={{ height: '180px', width: '180px', borderRadius: '50%', objectFit: 'cover', marginBottom: '1%', marginLeft: '28%', alignItems: 'center' }} />
+                <h1 style={{ marginBottom: '3%', color: '#ffffff', fontFamily: 'inherit', fontWeight: 'bold', fontSize: '25px', textAlign: 'center' }}>Login to GitHub Account</h1>
+                <p style={{ color: '#ffffff', textAlign: 'center', fontFamily: 'inherit', fontSize: '25px' }}>Enter your details to access the application</p>
 
                 <form onSubmit={handleLogin} className="login-form">
                     <div className="input-group">
@@ -136,6 +104,6 @@ export default function Login({ onLoginSuccess, isLoggedIn, onNavigate }) {
                     </button>
                 )}
             </div>
-        </section>
+        </section >
     );
 }

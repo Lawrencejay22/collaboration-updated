@@ -4,8 +4,8 @@ import '../main.css';
 export default function Header({ onNavigate, currentPage, isLoggedIn, onLogout, notificationsCount }) {
     return (
         <header className="header">
-            <div className="logo-container" onClick={() => isLoggedIn && onNavigate('home')}>
-                <h1 className="logo">GitHub User Finder</h1>
+            <div className="logo-container" onClick={() => isLoggedIn && onNavigate('home')} style={{ display: 'flex', alignItems: 'center' }}>
+                <img src="/logo.png" alt="GitHub-User-Finder-Logo" style={{ height: '90px', width: '90px', borderRadius: '50%', objectFit: 'cover' }} />
             </div>
 
             {isLoggedIn && (

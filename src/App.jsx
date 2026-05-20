@@ -31,6 +31,37 @@ export default function App() {
   const [githubUserName, setGithubUserName] = useState('');
   const [currentPage, setCurrentPage] = useState('login');
 
+  // --- OAuth Callback Handling ---
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('auth_success') === 'true') {
+      const userDataStr = params.get('user');
+      if (userDataStr) {
+        try {
+          const parsedUser = JSON.parse(decodeURIComponent(userDataStr));
+          setIsLoggedIn(true);
+          setUser({
+            username: parsedUser.login,
+            name: parsedUser.name || parsedUser.login,
+            avatar: parsedUser.avatar_url,
+            bio: parsedUser.bio || 'GitHub Developer',
+            repos: parsedUser.public_repos,
+            followers: parsedUser.followers,
+            following: parsedUser.following
+          });
+          setCurrentPage('home');
+          // Clean up the URL so it looks nice
+          window.history.replaceState({}, document.title, window.location.pathname);
+        } catch (e) {
+          console.error("Failed to parse OAuth user data:", e);
+        }
+      }
+    } else if (params.get('error')) {
+      setNotification({ message: 'GitHub Login Error: ' + params.get('error'), type: 'error' });
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
   // --- Search & Results State ---
   const [isSearching, setIsSearching] = useState(false);
   const [searchedUser, setSearchedUser] = useState(null);
@@ -185,16 +216,12 @@ export default function App() {
   };
 
   const confirmCollaboration = (repoName) => {
-    showAlert(`Redirecting to GitHub to invite @${searchedUser.username} to collaborate on "${repoName}"!`, "success");
+    showAlert(`Successfully sent a collaboration invite to @${searchedUser.username} for "${repoName}"!`, "success");
     setCollaborate(true);
     setSelectedRepo(repoName);
     setCollabStatus('pending');
     setIsModalOpen(false);
     setCurrentPage('collaboration');
-
-    // Open GitHub collaboration settings page in a new tab so the user can invite the collaborator directly on GitHub!
-    const inviteUrl = `https://github.com/${user?.username || ' '}/${repoName}/settings/collaboration`;
-    window.open(inviteUrl, '_blank');
   };
 
   const sendChatMessage = (e) => {
@@ -229,13 +256,9 @@ export default function App() {
         if (prevRequests.some(req => req.username === searchedUser.username)) return prevRequests;
         return [...prevRequests, { ...searchedUser, message: friendMessage, status: 'pending' }];
       });
-      showAlert(`Opening @${searchedUser.username}'s GitHub profile! Click Follow to send a notification.`, "success");
+      showAlert(`Follow request successfully sent to @${searchedUser.username}!`, "success");
       setIsSendingRequest(false);
       setIsFriendModalOpen(false);
-
-      // Open the target user's real GitHub profile page in a new tab so they can be followed directly on GitHub!
-      const profileUrl = `https://github.com/${searchedUser.username}`;
-      window.open(profileUrl, '_blank');
 
       setSearchedUser(null);
       setSearchInput('');
@@ -416,7 +439,7 @@ export default function App() {
                           )}
                         </div>
                         <h3>Collaboration Request Sent</h3>
-                        <p className="request-subtitle">Your proposal is being delivered to {searchedUser?.name || 'the developer'}</p>
+                        <p className="request-subtitle">Your request is being delivered to {searchedUser?.name || 'the developer'}</p>
                       </div>
 
                       <div className="request-summary-card">
@@ -474,7 +497,6 @@ export default function App() {
                     </div>
                   </div>
                 ) : (
-                  // Active Collaboration Workspace (IDE + Chat!)
                   <div className="workspace-container" style={{ textAlign: 'left', marginTop: '20px' }}>
                     <div className="collab-status-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', padding: '12px 20px', borderRadius: '12px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
