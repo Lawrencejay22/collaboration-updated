@@ -20,8 +20,17 @@ app.use(express.json());
 // OAuth configuration
 const CLIENT_ID = process.env.GITHUB_CLIENT_ID;
 const CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
-const CALLBACK_URL = 'http://localhost:3000/api/auth/github/callback';
-const FRONTEND_URL = 'http://localhost:5173';
+
+// Determine environment
+const IS_PROD = process.env.NODE_ENV === 'production' || process.env.VERCEL;
+
+// Vercel populates VERCEL_PROJECT_PRODUCTION_URL or VERCEL_URL. Fallback to localhost.
+const host = process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL || 'localhost:3000';
+const BASE_URL = IS_PROD ? `https://${host}` : 'http://localhost:3000';
+const FRONTEND_BASE = IS_PROD ? `https://${host}` : 'http://localhost:5173';
+
+const CALLBACK_URL = `${BASE_URL}/api/auth/github/callback`;
+const FRONTEND_URL = `${FRONTEND_BASE}`;
 
 // 1. Redirect user to GitHub for authorization
 app.get('/api/auth/github', (req, res) => {
@@ -81,6 +90,11 @@ app.get('/api/auth/github/callback', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Backend API Server running at http://localhost:${PORT}`);
-});
+if (!IS_PROD) {
+    app.listen(PORT, () => {
+        console.log(`Backend API Server running at http://localhost:${PORT}`);
+    });
+}
+
+// Export the app for Vercel Serverless Functions
+export default app;
