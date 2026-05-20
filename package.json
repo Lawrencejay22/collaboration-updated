@@ -4,9 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "node start.js",
-    "dev:frontend": "vite",
-    "dev:backend": "node server/index.js",
+    "start": "node server/index.js",
+    "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
