@@ -44,7 +44,7 @@ app.get('/api/auth/github', (req, res) => {
         `);
     }
 
-    const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&scope=repo read:user user:follow`;
+    const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(CALLBACK_URL)}&scope=repo read:user user:follow`;
     res.redirect(githubAuthUrl);
 });
 
