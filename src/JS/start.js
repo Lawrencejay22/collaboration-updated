@@ -1,4 +1,4 @@
-import './server/index.js';
+import '../../server/index.js';
 import { createServer } from 'vite';
 
 async function startApp() {
@@ -10,7 +10,7 @@ async function startApp() {
         port: 5173
       }
     });
-    
+
     await viteServer.listen();
     viteServer.printUrls();
     console.log('\n✅ Frontend and Backend are both running successfully in a single process!');

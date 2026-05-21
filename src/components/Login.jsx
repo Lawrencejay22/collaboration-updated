@@ -18,11 +18,11 @@ export default function Login({ onLoginSuccess, isLoggedIn, onNavigate }) {
         }
         setIsConnecting(true);
         try {
-            const response = await fetch(`https://api.github.com/users/${trimmedUser}`);
+            const response = await fetch(`/api/users/${trimmedUser}`);
             if (response.ok) {
                 const data = await response.json();
                 onLoginSuccess({
-                    username: data.login,
+                    username: data.login || data.username,
                     name: data.name || data.login,
                     avatar: data.avatar_url,
                     bio: data.bio || 'GitHub Developer',
@@ -41,7 +41,6 @@ export default function Login({ onLoginSuccess, isLoggedIn, onNavigate }) {
     };
     const mockGithubLogin = (e) => {
         if (e && e.preventDefault) e.preventDefault();
-        // Redirect to the backend which handles the real GitHub automatic OAuth login
         window.location.href = '/api/auth/github';
     };
 

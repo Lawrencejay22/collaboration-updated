@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  name        String?
+  avatar      String?
+  bio         String?
+  accessToken String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  sentRequests     FollowRequest[] @relation("SentRequests")
+  receivedRequests FollowRequest[] @relation("ReceivedRequests")
+  
+  initiatedCollabs Collaboration[] @relation("InitiatedCollabs")
+  targetCollabs    Collaboration[] @relation("TargetCollabs")
+  
+  messages         Message[]
+}
+
+model FollowRequest {
+  id         String   @id @default(uuid())
+  senderId   String
+  receiverId String
+  status     String   @default("pending") // 'pending', 'accepted', 'rejected'
+  createdAt  DateTime @default(now())
+
+  sender   User @relation("SentRequests", fields: [senderId], references: [id])
+  receiver User @relation("ReceivedRequests", fields: [receiverId], references: [id])
+
+  @@unique([senderId, receiverId])
+}
+
+model Collaboration {
+  id         String   @id @default(uuid())
+  initiatorId String
+  targetId    String
+  repoName    String
+  status      String   @default("pending") // 'pending', 'active', 'completed'
+  createdAt   DateTime @default(now())
+
+  initiator User @relation("InitiatedCollabs", fields: [initiatorId], references: [id])
+  target    User @relation("TargetCollabs", fields: [targetId], references: [id])
+  
+  messages  Message[]
+}
+
+model Message {
+  id              String   @id @default(uuid())
+  collaborationId String
+  senderId        String
+  text            String
+  createdAt       DateTime @default(now())
+
+  collaboration Collaboration @relation(fields: [collaborationId], references: [id])
+  sender        User          @relation(fields: [senderId], references: [id])
+}
