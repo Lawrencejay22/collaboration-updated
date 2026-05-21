@@ -69,6 +69,7 @@ app.get('/api/auth/github/callback', async (req, res) => {
             }
         });
 
+        console.log('🔑 Token response data:', tokenResponse.data);
         const accessToken = tokenResponse.data.access_token;
 
         if (!accessToken) {
