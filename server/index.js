@@ -34,6 +34,8 @@ const FRONTEND_BASE = IS_PROD ? `https://${host}` : 'http://localhost:5173';
 
 const CALLBACK_URL = `${BASE_URL}/api/auth/github/callback`;
 const FRONTEND_URL = `${FRONTEND_BASE}`;
+// Debug: show callback URL on server start (helps verify Vercel env)
+console.log('🔧 CALLBACK_URL:', CALLBACK_URL);
 
 // 1. Redirect user to GitHub for authorization
 app.get('/api/auth/github', (req, res) => {
