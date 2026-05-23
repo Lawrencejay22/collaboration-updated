@@ -12,6 +12,17 @@
     --friend-request-bg: rgba(8, 255, 103, 0.61);
 }
 
+html,
+body {
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+
 * {
     margin: 0;
     padding: 0;
